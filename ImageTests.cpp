@@ -3,9 +3,16 @@
 //
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-
+#include "Image.h"
 #include "ImageTests.h"
-//Test case 1
+using namespace SCRSHA001;
+
+TEST_CASE("Image class loading and saving") {
+    Image *img = new Image();
+    (*img).load("donkey_mask.pgm");
+    delete img;
+}
+
 TEST_CASE("Image class constructors") {
 
     SECTION("Testing letter frequency table") {
