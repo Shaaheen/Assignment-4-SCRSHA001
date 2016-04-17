@@ -10,9 +10,14 @@
 
 class Image
 {
-    private:
-        int width, height;
+public:
+    Image();
+    virtual ~Image();
+    bool load();
+
+private:
         friend class iterator;
+        int width, height;
         std::unique_ptr<unsigned char[]> data;
     public:
         class iterator
@@ -22,19 +27,18 @@ class Image
                 unsigned char *ptr;
                 // construct only via Image class (begin/end)
 
-                iterator(unsigned char *p) : ptr(p) {}
+                iterator(unsigned char *p);// : ptr(p) {}
 
             public:
                 //copy construct is public
-                iterator( const iterator & rhs) : ptr(rhs.ptr) {}
+                iterator( const iterator & rhs);// : ptr(rhs.ptr) {}
                 // define overloaded ops: *, ++, --, =
-                iterator & operator=(const iterator & rhs)
-                {}
+                iterator & operator=(const iterator & rhs);
                 // other methods for iterator
         };
         // define begin()/end() to get iterator to start and
         // "one-past" end.
-        iterator begin(void) { return iterator(data.get());} // etc
+        iterator begin(void);// { return iterator(data.get());} // etc
 };
 
 
