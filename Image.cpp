@@ -159,4 +159,13 @@ namespace SCRSHA001{
     Image::iterator Image::end(void) {
         return Image::iterator((data.get()+(width*height))); //offset to end of array
     }
+
+    unsigned char *&Image::iterator::operator*() {
+            return ptr;
+    }
+
+    iterator Image::iterator::operator++() {
+        unsigned char * next = (unsigned char *) *(ptr + 1);
+        return iterator(next);
+    }
 }

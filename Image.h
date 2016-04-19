@@ -60,9 +60,9 @@ namespace SCRSHA001 {
             iterator &operator=(const iterator &rhs);
             iterator &operator=(const iterator &&rhs);
 
-            unsigned char* &operator*(){
-                return ptr;
-            }
+            unsigned char* &operator*();
+            iterator operator++();
+
 
 
         };

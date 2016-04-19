@@ -139,13 +139,15 @@ TEST_CASE("Image class Iterator and its operators"){
     string filename= "donkey_mask.pgm";
     string filename2 = "Lenna_hat_mask.pgm";
 
-    SECTION("Iterator constructor"){
+    SECTION("Iterator constructor and * operator"){
         Image img  = Image(filename2);
         Image::iterator iterator1 = img.begin();
         int n = memcmp(img.getData(),*iterator1,img.getWidth()*img.getHeight());
         REQUIRE(n == 0 );//Makes sure data is the same
     }
-    SECTION("Iterator")
+    SECTION("++ Iterator"){
+
+    }
 
 }
 TEST_CASE("Thresholding, inverting and masking operator overloads"){
