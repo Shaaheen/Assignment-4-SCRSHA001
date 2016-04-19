@@ -17,10 +17,16 @@ namespace SCRSHA001 {
         std::unique_ptr<unsigned char[]> data;
     public:
         Image();
+        Image(std::string &fileName);
 
         virtual ~Image();
 
         bool load(std::string inFileName);
+
+        friend std::ostream& operator>>(std::ifstream& os, int wh);
+
+        int getWidth();
+        int getHeight();
 
         bool save(std::string outFileName);
 
