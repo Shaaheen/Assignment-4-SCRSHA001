@@ -164,8 +164,13 @@ namespace SCRSHA001{
             return ptr;
     }
 
-    iterator Image::iterator::operator++() {
-        unsigned char * next = (unsigned char *) *(ptr + 1);
-        return iterator(next);
+    Image::iterator & Image::iterator::operator++() {
+        ptr = (unsigned char *) *(ptr + 1); //todo check if working
+        return *this;
+    }
+
+    Image::iterator & Image::iterator::operator--() {
+        ptr = (unsigned char *) *(ptr - 1);
+        return *this;
     }
 }

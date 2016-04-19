@@ -138,15 +138,19 @@ TEST_CASE("Image class constructors") {
 TEST_CASE("Image class Iterator and its operators"){
     string filename= "donkey_mask.pgm";
     string filename2 = "Lenna_hat_mask.pgm";
+    Image img  = Image(filename2);
 
     SECTION("Iterator constructor and * operator"){
-        Image img  = Image(filename2);
         Image::iterator iterator1 = img.begin();
         int n = memcmp(img.getData(),*iterator1,img.getWidth()*img.getHeight());
         REQUIRE(n == 0 );//Makes sure data is the same
     }
     SECTION("++ Iterator"){
-
+        //todo complete iterator ++ test
+        Image::iterator iterator1 = img.begin();
+        ++iterator1;
+        int n = memcmp((const void *) *(img.getData() + 1), *iterator1, img.getWidth() * img.getHeight());
+        REQUIRE(n == 0 );//Makes sure data is the same
     }
 
 }
