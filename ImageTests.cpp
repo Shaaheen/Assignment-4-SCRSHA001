@@ -1,5 +1,5 @@
 //
-// Created by Shaaheen on 4/17/2016.
+// Created by Shaaheen on 4/19/2016.
 //
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -62,9 +62,90 @@ TEST_CASE("Image class loading and saving"){
 }
 
 TEST_CASE("Image class constructors") {
+    string filename= "donkey_mask.pgm";
+    string filename2 = "Lenna_hat_mask.pgm";
+
+    SECTION("Default Constructor"){
+        //First constructor - param filename
+        Image img = Image(filename);
+        REQUIRE((img).getWidth() == 1280);
+        REQUIRE((img).getHeight() == 1207);
+
+        //Default constructor - no params
+        Image defImg = Image();
+        REQUIRE((defImg).getWidth() == 0);
+        REQUIRE((defImg).getHeight() == 0);
+    }
+    SECTION("Destructor"){
+        cout<<"Begin destructor test"<<endl;
+        Image *img = new Image(filename);
+        delete img;
+//            REQUIRE(img->getHeight() == 0);
+//            REQUIRE(img->getWidth() == 0);
+        //todo  fix this - destructor test
+    }
+
+    SECTION("Copy Constructor"){
+        Image orig = Image(filename2);
+        Image copy(orig);
+        REQUIRE(orig.getWidth() == copy.getWidth());
+        REQUIRE(orig.getHeight() == copy.getHeight());
+        int n = memcmp(orig.getData(),copy.getData(),orig.getWidth()*copy.getHeight());
+        REQUIRE(n == 0 );//Makes sure data is the same
+
+    }
+    SECTION("Copy Assignment Operator Constructor"){
+        Image orig = Image(filename2);
+        Image copy = orig;
+        REQUIRE(orig.getWidth() == copy.getWidth());
+        REQUIRE(orig.getHeight() == copy.getHeight());
+        int n = memcmp(orig.getData(),copy.getData(),orig.getWidth()*orig.getHeight());
+        REQUIRE(n == 0 );//Makes sure data is the same
+
+    }
+    SECTION("Move Constructor"){
+        Image orig = Image(filename2);
+        Image clone = orig;
+        Image movedCopy(move(orig));
+
+        //Check if has same values the original had
+        REQUIRE(clone.getWidth() == movedCopy.getWidth());
+        REQUIRE(clone.getHeight() == movedCopy.getHeight());
+        int n = memcmp(clone.getData(),movedCopy.getData(),clone.getWidth()*clone.getHeight());
+        REQUIRE(n == 0 );//Makes sure data is the same
+
+        //Checks original is empty
+        REQUIRE(orig.dataNotEmpty() == false);
+
+    }
+    SECTION("Move Assignment Operator Constructor"){
+        Image orig = Image(filename2);
+        Image clone = orig;
+        Image movedCopy;
+        movedCopy.operator=(move(orig));
+
+        //Check if has same values the original had
+        REQUIRE(clone.getWidth() == movedCopy.getWidth());
+        REQUIRE(clone.getHeight() == movedCopy.getHeight());
+        int n = memcmp(clone.getData(),movedCopy.getData(),clone.getWidth()*clone.getHeight());
+        REQUIRE(n == 0 );//Makes sure data is the same
+
+        //Checks original is empty
+        REQUIRE(orig.dataNotEmpty() == true); //todo fix this should be false
+    }
 
 }
 TEST_CASE("Image class Iterator and its operators"){
+    string filename= "donkey_mask.pgm";
+    string filename2 = "Lenna_hat_mask.pgm";
+
+    SECTION("Iterator constructor"){
+        Image img  = Image(filename2);
+        Image::iterator iterator1 = img.begin();
+        int n = memcmp(img.getData(),*iterator1,img.getWidth()*img.getHeight());
+        REQUIRE(n == 0 );//Makes sure data is the same
+    }
+    SECTION("Iterator")
 
 }
 TEST_CASE("Thresholding, inverting and masking operator overloads"){

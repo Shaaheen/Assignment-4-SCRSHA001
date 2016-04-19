@@ -9,28 +9,41 @@
 using namespace std;
 
 namespace SCRSHA001{
-    Image::iterator::iterator(const Image::iterator &rhs): ptr(rhs.ptr) {
+    Image::iterator::iterator(const Image::iterator &rhs): ptr(rhs.ptr) { }
 
+    Image::iterator::iterator(unsigned char *p): ptr(p) { }
+    Image::iterator& Image::iterator::operator=(const Image::iterator &rhs) {
+        ptr = (rhs.ptr);
+        return *this;
+    }
+    Image::iterator& Image::iterator::operator=(const Image::iterator &&rhs) {
+        ptr = (move(rhs.ptr));
     }
 
-    Image::iterator::iterator(unsigned char *p): ptr(p) {
 
+    Image::Image() {
+        height =0;
+        width =0;
     }
-
-    Image::Image() { }
 
     Image::Image(std::string &fileName) {
         load(fileName);
     }
 
-    Image::~Image() { }
+    Image::~Image() {
+        cout<<"Destructore called"<<endl;
+        width =0;
+        height =0;
+        data.release();
+    }
 
     Image::Image(const Image &rhs) : width(rhs.width),height(rhs.height) {
         data.reset(rhs.data.get());
     }
 
     Image::Image(Image &&rhs): width(move(rhs.width)),height(move(rhs.height)){
-        data.reset(move(rhs.data).get());
+        //data.reset(move(rhs.data).get());
+        data.swap(rhs.data);
     }
 
     Image &Image::operator=(const Image &rhs) {
@@ -41,10 +54,26 @@ namespace SCRSHA001{
     }
 
     Image &Image::operator=(const Image &&rhs) {
+        //cout<<"Move op called"<<endl;
         width = move(rhs.width);
         height = move(rhs.height);
         data.reset(move(rhs.data).get());
         return *this;
+    }
+
+    int Image::getWidth() const {
+        return this->width;
+    }
+
+    int Image::getHeight() const{
+        return this->height;
+    }
+    bool Image::dataNotEmpty() const{
+        if (data){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 //    std::ostream &SCRSHA001::operator>>(std::ifstream &input, int wh) {
@@ -98,14 +127,6 @@ namespace SCRSHA001{
     }
 
 
-    int Image::getWidth() {
-        return width;
-    }
-
-    int Image::getHeight() {
-        return height;
-    }
-
     //Save function to store pgm file
     bool Image::save(std::string outFileName) {
         cout<<"Save function call"<<endl;
@@ -127,5 +148,15 @@ namespace SCRSHA001{
 
     }
 
+    unsigned char *Image::getData() const {
+        return data.get();
+    }
 
+    Image::iterator Image::begin(void) {
+        return Image::iterator(data.get());
+    }
+
+    Image::iterator Image::end(void) {
+        return Image::iterator((data.get()+(width*height))); //offset to end of array
+    }
 }
