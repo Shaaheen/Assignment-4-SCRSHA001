@@ -18,6 +18,12 @@ namespace SCRSHA001 {
     public:
         Image();
         Image(std::string &fileName);
+        Image(const Image & rhs); //copy
+        Image(Image &&rhs);//move
+
+        Image &operator=(const Image & rhs); //copy assignment
+        Image &operator=(const Image && rhs);//move assignment
+
 
         virtual ~Image();
 

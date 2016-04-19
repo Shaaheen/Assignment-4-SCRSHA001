@@ -25,6 +25,28 @@ namespace SCRSHA001{
 
     Image::~Image() { }
 
+    Image::Image(const Image &rhs) : width(rhs.width),height(rhs.height) {
+        data.reset(rhs.data.get());
+    }
+
+    Image::Image(Image &&rhs): width(move(rhs.width)),height(move(rhs.height)){
+        data.reset(move(rhs.data).get());
+    }
+
+    Image &Image::operator=(const Image &rhs) {
+        width = rhs.width;
+        height = rhs.height;
+        data.reset(rhs.data.get());
+        return *this;
+    }
+
+    Image &Image::operator=(const Image &&rhs) {
+        width = move(rhs.width);
+        height = move(rhs.height);
+        data.reset(move(rhs.data).get());
+        return *this;
+    }
+
 //    std::ostream &SCRSHA001::operator>>(std::ifstream &input, int wh) {
 //        string line;
 //        int count;
@@ -84,14 +106,15 @@ namespace SCRSHA001{
         return height;
     }
 
+    //Save function to store pgm file
     bool Image::save(std::string outFileName) {
         cout<<"Save function call"<<endl;
-        ofstream output(outFileName);
+        ofstream output(outFileName); //Open file
         if (output.is_open()){
-            string header = "P5\n" + to_string(width) + " " + to_string(height) +"\n255\n";
+            string header = "P5\n" + to_string(width) + " " + to_string(height) +"\n255\n"; //Header info
             const char* bytesInHeader = header.c_str();
-            output.write(bytesInHeader,header.length());
-            output.write((const char *) data.get(), width * height);
+            output.write(bytesInHeader,header.length()); //Write header info as chars
+            output.write((const char *) data.get(), width * height); //Write all the unsigned char data to file
             output.close();
             cout<<"Save function call done"<<endl;
             return true;

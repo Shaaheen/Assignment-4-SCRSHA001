@@ -63,9 +63,6 @@ TEST_CASE("Image class loading and saving"){
 
 TEST_CASE("Image class constructors") {
 
-    SECTION("Testing letter frequency table") {
-
-    }
 }
 TEST_CASE("Image class Iterator and its operators"){
 
