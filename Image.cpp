@@ -31,7 +31,7 @@ namespace SCRSHA001{
     }
 
     Image::~Image() {
-        cout<<"Destructore called"<<endl;
+        cout<<"Destructor called"<<endl;
         width =0;
         height =0;
         data.release();
@@ -75,12 +75,6 @@ namespace SCRSHA001{
             return false;
         }
     }
-
-//    std::ostream &SCRSHA001::operator>>(std::ifstream &input, int wh) {
-//        string line;
-//        int count;
-//        return <#initializer#>;
-//    }
 
     bool Image::load(string inFileName) {
         //todo make << and >> ops to get the header info
@@ -165,12 +159,12 @@ namespace SCRSHA001{
     }
 
     Image::iterator & Image::iterator::operator++() {
-        ptr = (unsigned char *) *(ptr + 1); //todo check if working
+        ptr = (ptr + 1); //todo check if working
         return *this;
     }
 
     Image::iterator & Image::iterator::operator--() {
-        ptr = (unsigned char *) *(ptr - 1);
+        ptr = (ptr - 1);
         return *this;
     }
 }

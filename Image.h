@@ -75,6 +75,7 @@ namespace SCRSHA001 {
         iterator end(void);
 
         bool dataNotEmpty() const;
+
     };
 }
 

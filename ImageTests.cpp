@@ -35,9 +35,10 @@ TEST_CASE("Image class loading and saving"){
     }
     SECTION("Saving"){
         std::string filename= "donkey_mask.pgm";
-        Image *img2 = new Image(filename);
-        (*img2).save("Clone.pgm");
-        delete img2;
+        Image img2 = Image(filename);
+        (img2).save("Clone2.pgm");
+        unsigned char *data = img2.getData();
+        //delete img2;
         ifstream ifs(filename, ios::binary|ios::ate);
         ifstream::pos_type pos = ifs.tellg();
         int length = pos;
@@ -45,7 +46,7 @@ TEST_CASE("Image class loading and saving"){
         ifs.read(pChars, length);
         ifs.close();
 
-        ifstream ifs2("Clone.pgm", ios::binary|ios::ate);
+        ifstream ifs2("Clone2.pgm", ios::binary|ios::ate);
         ifstream::pos_type pos2 = ifs2.tellg();
         int length2 = pos;
         char *pChars2 = new char[length2];
@@ -140,17 +141,49 @@ TEST_CASE("Image class Iterator and its operators"){
     string filename2 = "Lenna_hat_mask.pgm";
     Image img  = Image(filename2);
 
+    SECTION("Iterator begin() and end() methods"){
+        Image::iterator iterator1 = img.begin();
+        unsigned char* iteratorDataP = *iterator1;
+
+    }
     SECTION("Iterator constructor and * operator"){
         Image::iterator iterator1 = img.begin();
         int n = memcmp(img.getData(),*iterator1,img.getWidth()*img.getHeight());
+        unsigned char *data = img.getData();
         REQUIRE(n == 0 );//Makes sure data is the same
+        REQUIRE(img.getData() == *iterator1);
     }
     SECTION("++ Iterator"){
-        //todo complete iterator ++ test
         Image::iterator iterator1 = img.begin();
-        ++iterator1;
-        int n = memcmp((const void *) *(img.getData() + 1), *iterator1, img.getWidth() * img.getHeight());
-        REQUIRE(n == 0 );//Makes sure data is the same
+        unsigned char* data = img.getData();
+        int countIfEqual = 0;
+        for (int i = 0; i < img.getHeight()*img.getWidth(); ++i) {
+            unsigned char elementInMainData = data[i];
+            unsigned char* iteratorDataP = *iterator1;
+            unsigned char iteratorData = iteratorDataP[0];
+            if (elementInMainData == iteratorData){ //Had REQUIRE here but accumalted to too many assertions in test
+                countIfEqual++;
+            }
+            ++iterator1;
+        }
+        //Test if counter is equal to total number of elements in array
+        REQUIRE(countIfEqual == (img.getHeight()*img.getWidth()));
+    }
+    SECTION("-- Iterator"){
+        Image::iterator iterator1 = img.end();
+        unsigned char* data = img.getData();
+        int countIfEqual = 0;
+        for (int i = img.getHeight()*img.getWidth(); i >0; --i) {
+            unsigned char elementInMainData = data[i];
+            unsigned char* iteratorDataP = *iterator1;
+            unsigned char iteratorData = iteratorDataP[0];
+            if (elementInMainData == iteratorData){ //Had REQUIRE here but accumalted to too many assertions in test
+                countIfEqual++;
+            }
+            --iterator1;
+        }
+        //Test if counter is equal to total number of elements in array
+        REQUIRE(countIfEqual == (img.getHeight()*img.getWidth()));
     }
 
 }
