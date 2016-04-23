@@ -56,7 +56,6 @@ TEST_CASE("Image class loading and saving"){
         int n = memcmp(pChars,pChars2,length); //Compares two blocks of memory, if n ==0 then identical
         REQUIRE(n ==0);
 
-
     }
 
 
@@ -91,8 +90,7 @@ TEST_CASE("Image class constructors") {
         Image copy(orig);
         REQUIRE(orig.getWidth() == copy.getWidth());
         REQUIRE(orig.getHeight() == copy.getHeight());
-        int n = memcmp(orig.getData(),copy.getData(),orig.getWidth()*copy.getHeight());
-        REQUIRE(n == 0 );//Makes sure data is the same
+        REQUIRE(strcmp( (const char *) orig.getData(),(const char *) copy.getData()) == 0 );//Makes sure data is the same
 
     }
     SECTION("Copy Assignment Operator Constructor"){
@@ -100,8 +98,7 @@ TEST_CASE("Image class constructors") {
         Image copy = orig;
         REQUIRE(orig.getWidth() == copy.getWidth());
         REQUIRE(orig.getHeight() == copy.getHeight());
-        int n = memcmp(orig.getData(),copy.getData(),orig.getWidth()*orig.getHeight());
-        REQUIRE(n == 0 );//Makes sure data is the same
+        REQUIRE(strcmp( (const char *) orig.getData(),(const char *) copy.getData()) == 0 );//Makes sure data is the same
 
     }
     SECTION("Move Constructor"){
@@ -112,13 +109,13 @@ TEST_CASE("Image class constructors") {
         //Check if has same values the original had
         REQUIRE(clone.getWidth() == movedCopy.getWidth());
         REQUIRE(clone.getHeight() == movedCopy.getHeight());
-        int n = memcmp(clone.getData(),movedCopy.getData(),clone.getWidth()*clone.getHeight());
-        REQUIRE(n == 0 );//Makes sure data is the same
+        REQUIRE(strcmp( (const char *) movedCopy.getData(),(const char *) clone.getData()) == 0 );//Makes sure data is the same
 
         //Checks original is empty
         REQUIRE(orig.dataNotEmpty() == false);
 
     }
+
     SECTION("Move Assignment Operator Constructor"){
         Image orig = Image(filename2);
         Image clone = orig;
@@ -128,11 +125,11 @@ TEST_CASE("Image class constructors") {
         //Check if has same values the original had
         REQUIRE(clone.getWidth() == movedCopy.getWidth());
         REQUIRE(clone.getHeight() == movedCopy.getHeight());
-        int n = memcmp(clone.getData(),movedCopy.getData(),clone.getWidth()*clone.getHeight());
-        REQUIRE(n == 0 );//Makes sure data is the same
+        REQUIRE(strcmp( (const char *) movedCopy.getData(),(const char *) clone.getData()) == 0 );//Makes sure data is the same
 
         //Checks original is empty
         REQUIRE(orig.dataNotEmpty() == true); //todo fix this should be false
+
     }
 
 }
@@ -224,17 +221,30 @@ TEST_CASE("Thresholding, inverting and masking operator overloads"){
 }
 TEST_CASE("Addition and subtraction of images"){
     string filename= "Lenna_standard.pgm";
-    string filename2 = "Lenna_standard.pgm";
+    string filename2 = "Lenna_hat_mask.pgm";
     Image img  = Image(filename2);
     Image img2 = Image(filename);
     SECTION("Addition test"){
         Image addedImage = Image();
-        addedImage= img+img2;
-        Image::iterator iteratorI = addedImage.begin();
-        unsigned char * addedData = addedImage.getData();
+        addedImage= img+img2; //Add images together
+        unsigned char * addedData = addedImage.getData(); //Get data var to test against
         unsigned char * image1Data = img.getData();
         unsigned char * image2Data = img2.getData();
-        cout<<""<<endl;
+        int additionCorrectCounter = 0;
+        int loopTill = img.getWidth() * img.getHeight();
+        for (int i = 0; i < loopTill; ++i) {
+            unsigned char expectedAddedValue = addedData[i];
+            unsigned char image1Val = image1Data[i];
+            unsigned char image2Val = image2Data[i];
+            if ((image1Val + image2Val)>255 ){ //If addition greater than 255, should be 255
+                if (expectedAddedValue == 255)
+                    additionCorrectCounter++;
+            }
+            else if (expectedAddedValue == (image1Val + image2Val)){ //Check addition correct
+                additionCorrectCounter++;
+            }
+        }
+        REQUIRE(additionCorrectCounter == loopTill/*(img.getWidth() + img.getHeight())*/ );
     }
 
 }

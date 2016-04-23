@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string.h>
 #include "Image.h"
 using namespace std;
 
@@ -37,14 +38,15 @@ namespace SCRSHA001{
     }
 
     Image::~Image() {
-        cout<<"Destructor called"<<endl;
         width =0;
         height =0;
         data.release();
     }
 
     Image::Image(const Image &rhs) : width(rhs.width),height(rhs.height) {
-        data.reset(rhs.data.get());
+        unsigned char copyData[width*height];
+        strcpy((char *) copyData, (const char *) rhs.data.get());
+        data.reset(copyData);
     }
 
     Image::Image(Image &&rhs): width(move(rhs.width)),height(move(rhs.height)){
@@ -84,7 +86,6 @@ namespace SCRSHA001{
 
     bool Image::load(string inFileName) {
         //todo make << and >> ops to get the header info
-        cout<<"Load function called"<<endl;
         ifstream input(inFileName,ios::binary | ios::in);
         string line;
         int width;
@@ -94,7 +95,6 @@ namespace SCRSHA001{
             while(getline(input,line)){
                 //input.read(reinterpret_cast<char *>(&p), sizeof(int));
                 if (line.at(0) != '#'){
-                    cout<<line<<endl;
                     count++;
                     if (count ==2){ //rows and columns in this line
                         stringstream ss;
@@ -116,12 +116,8 @@ namespace SCRSHA001{
         unsigned char* mainData= new unsigned char[width*height];
         input.read((char *) mainData, width * height);
 
-        cout<<"Height :"<<height<<endl;
-        cout<<"Width : "<<width<<endl;
-
         (this->data).reset(mainData);
 
-        cout<<"Load function call done"<<endl;
         input.close();
         return false;
     }
@@ -129,7 +125,6 @@ namespace SCRSHA001{
 
     //Save function to store pgm file
     bool Image::save(std::string outFileName) {
-        cout<<"Save function call"<<endl;
         ofstream output(outFileName); //Open file
         if (output.is_open()){
             string header = "P5\n" + to_string(width) + " " + to_string(height) +"\n255\n"; //Header info
@@ -137,11 +132,9 @@ namespace SCRSHA001{
             output.write(bytesInHeader,header.length()); //Write header info as chars
             output.write((const char *) data.get(), width * height); //Write all the unsigned char data to file
             output.close();
-            cout<<"Save function call done"<<endl;
             return true;
         }
         else{
-            cout<<"Save function call done"<<endl;
             return false;
         }
 
@@ -185,8 +178,6 @@ namespace SCRSHA001{
             cout<<"Image parameters not equal!"<<endl;
             exit(0);
         }
-        //unsigned char * testData = addedImage.getData();
-        //unsigned char addedImage[width*height];
         int counter = 0;
         Image::iterator image1 = this->begin(); //Iterator for second image
         //Would loop same amount of times for either image 1 or 2 iterator
@@ -204,8 +195,6 @@ namespace SCRSHA001{
             ++counter;
             ++image1;
         }
-        //unsigned char * testData2 = addedImage.getData();
-        //Image i = Image(addedImage, width, height);
         return *this;
     }
 
@@ -213,6 +202,36 @@ namespace SCRSHA001{
         return (this->ptr != rhs.ptr);
     }
 
+    Image Image::operator-(const Image & rhs) const {
+        Image subtractedImage(*this);
+        subtractedImage -= rhs;
+        return subtractedImage;
+    }
+
+    Image &Image::operator-=(const Image &rhs) {
+        if (this->getWidth() != rhs.getWidth() || this->getHeight() != rhs.getHeight()){
+            cout<<"Image parameters not equal!"<<endl;
+            exit(0);
+        }
+        int counter = 0;
+        Image::iterator image1 = this->begin(); //Iterator for second image
+        //Would loop same amount of times for either image 1 or 2 iterator
+        for (Image::iterator image2 = rhs.begin(); image2 != rhs.end(); ++image2) { //Iterator for 1st image
+            unsigned char image1Pixel = (*image1)[0];
+            unsigned char image2Pixel = (*image2)[0];
+            if ( (image1Pixel - image2Pixel) <0){
+                //addedImage[counter] =  255;
+                *(*image1) = 0;
+            }
+            else{
+                *(*image1) = (image1Pixel - image2Pixel);
+                //addedImage[counter] = (image1Pixel + image2Pixel);
+            }
+            ++counter;
+            ++image1;
+        }
+        return *this;
+    }
 
 
 }
