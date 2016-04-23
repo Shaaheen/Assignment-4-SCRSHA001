@@ -234,4 +234,35 @@ namespace SCRSHA001{
     }
 
 
+    Image Image::operator!() {
+        Image inverse(*this);
+        for (Image::iterator i = inverse.begin(); i != inverse.end(); ++i) {
+            *(*i) = (unsigned char) (255 - (*(*i)));
+        }
+        unsigned char * nd = inverse.getData();
+        return inverse;
+    }
+
+    Image Image::operator/(const Image &rhs) const {
+        if (this->getWidth() == rhs.width && this->getHeight() ==rhs.width){
+            Image mask(*this);
+
+            Image::iterator iteratorMask = mask.begin();
+            for (Image::iterator iteratorImage2 = rhs.begin(); iteratorImage2 != rhs.end(); ++iteratorImage2) {
+                if ( *(*iteratorImage2) == 0){
+                    *(*iteratorMask) = 0;
+                }
+                ++iteratorMask;
+            }
+            return mask;
+        }
+        else{
+            cout<<"Mask images not the same size!"<<endl;
+            exit(0);
+        }
+    }
+
+    Image &Image::operator*(const int threshold) {
+        return <#initializer#>;
+    }
 }

@@ -34,8 +34,8 @@ namespace SCRSHA001 {
         Image &operator+=(const Image & rhs);
         Image operator-(const Image & rhs ) const; //subtraction operator
         Image &operator-=(const Image & rhs);
-        Image &operator!() ; //Inverse operator
-        Image &operator/(const Image & rhs ) const; //Mask operator
+        Image operator!() ; //Inverse operator
+        Image operator/(const Image & rhs ) const; //Mask operator
         Image &operator*(const int threshold); //Threshold operator
 
 
