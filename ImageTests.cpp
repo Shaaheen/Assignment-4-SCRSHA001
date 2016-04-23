@@ -142,8 +142,19 @@ TEST_CASE("Image class Iterator and its operators"){
     Image img  = Image(filename2);
 
     SECTION("Iterator begin() and end() methods"){
+        //Begin should point to the char at the beginning of the array
         Image::iterator iterator1 = img.begin();
         unsigned char* iteratorDataP = *iterator1;
+        unsigned char iteratorData = iteratorDataP[0];
+        unsigned char elementInMainData = img.getData()[0];
+        REQUIRE(iteratorData == elementInMainData);
+
+        //End should point to the char at the end of the array
+        Image::iterator iterator2 = img.end();
+        unsigned char* iteratorDataP2 = *iterator1;
+        unsigned char iteratorData2 = iteratorDataP[0];
+        unsigned char elementInMainData2 = img.getData()[img.getWidth() * img.getHeight()-1];
+        REQUIRE(iteratorData2 == elementInMainData2);
 
     }
     SECTION("Iterator constructor and * operator"){
@@ -153,6 +164,21 @@ TEST_CASE("Image class Iterator and its operators"){
         REQUIRE(n == 0 );//Makes sure data is the same
         REQUIRE(img.getData() == *iterator1);
     }
+    SECTION("Iterator copy operator"){
+        Image::iterator iterator1 = img.begin();
+        Image::iterator iterator2 = iterator1;
+        iterator2 = iterator1;
+        REQUIRE(*iterator1 == *iterator2); //Checks if the data inside or the same
+    }
+    SECTION("Iterator move operator"){
+        Image::iterator iterator1 = img.begin();
+        unsigned char * storeOrginalBeforeMove = *iterator1;
+        Image::iterator iterator2 = iterator1;
+        iterator2 = move(iterator1);
+        REQUIRE(storeOrginalBeforeMove == *iterator2); //Checks if the data inside or the same
+        REQUIRE(*iterator1 == nullptr); //Iterator should now empty since moved out data
+    }
+
     SECTION("++ Iterator"){
         Image::iterator iterator1 = img.begin();
         unsigned char* data = img.getData();

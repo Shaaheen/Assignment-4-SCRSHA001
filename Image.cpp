@@ -16,8 +16,9 @@ namespace SCRSHA001{
         ptr = (rhs.ptr);
         return *this;
     }
-    Image::iterator& Image::iterator::operator=(const Image::iterator &&rhs) {
+    Image::iterator& Image::iterator::operator=(Image::iterator &&rhs) {
         ptr = (move(rhs.ptr));
+        rhs.ptr = nullptr;
     }
 
 

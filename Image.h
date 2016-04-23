@@ -58,7 +58,7 @@ namespace SCRSHA001 {
 
             // define overloaded ops: *, ++, --, =
             iterator &operator=(const iterator &rhs);
-            iterator &operator=(const iterator &&rhs);
+            iterator& operator=(iterator &&rhs);
 
             unsigned char* &operator*();
             iterator& operator++();
