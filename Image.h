@@ -23,11 +23,22 @@ namespace SCRSHA001 {
 
         Image();
         Image(std::string &fileName);
+        Image(unsigned char * data,int width, int height);
         Image(const Image & rhs); //copy
         Image(Image &&rhs);//move
 
         Image &operator=(const Image & rhs); //copy assignment
         Image &operator=(const Image && rhs);//move assignmen
+
+        Image operator+(const Image & rhs ) const; //addition operator
+        Image &operator+=(const Image & rhs);
+        Image &operator-(const Image & rhs ) const; //subtraction operator
+        Image &operator!() ; //Inverse operator
+        Image &operator/(const Image & rhs ) const; //Mask operator
+        Image &operator*(const int threshold); //Threshold operator
+
+
+
         virtual ~Image();
 
         bool load(std::string inFileName);
@@ -63,6 +74,7 @@ namespace SCRSHA001 {
             unsigned char* &operator*();
             iterator& operator++();
             iterator& operator--();
+            bool operator!=(const iterator &rhs);
 
 
 
@@ -70,9 +82,9 @@ namespace SCRSHA001 {
 
         // define begin()/end() to get iterator to start and
         // "one-past" end.
-        iterator begin(void);// { return iterator(data.get());} // etc
+        iterator begin(void)const;// { return iterator(data.get());} // etc
 
-        iterator end(void);
+        iterator end(void)const;
 
         bool dataNotEmpty() const;
 

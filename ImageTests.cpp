@@ -138,7 +138,7 @@ TEST_CASE("Image class constructors") {
 }
 TEST_CASE("Image class Iterator and its operators"){
     string filename= "donkey_mask.pgm";
-    string filename2 = "Lenna_hat_mask.pgm";
+    string filename2 = "Lenna_standard.pgm";
     Image img  = Image(filename2);
 
     SECTION("Iterator begin() and end() methods"){
@@ -151,8 +151,8 @@ TEST_CASE("Image class Iterator and its operators"){
 
         //End should point to the char at the end of the array
         Image::iterator iterator2 = img.end();
-        unsigned char* iteratorDataP2 = *iterator1;
-        unsigned char iteratorData2 = iteratorDataP[0];
+        unsigned char* iteratorDataP2 = *iterator2;
+        unsigned char iteratorData2 = iteratorDataP2[0];
         unsigned char elementInMainData2 = img.getData()[img.getWidth() * img.getHeight()-1];
         REQUIRE(iteratorData2 == elementInMainData2);
 
@@ -183,15 +183,21 @@ TEST_CASE("Image class Iterator and its operators"){
         Image::iterator iterator1 = img.begin();
         unsigned char* data = img.getData();
         int countIfEqual = 0;
-        for (int i = 0; i < img.getHeight()*img.getWidth(); ++i) {
+        int countNotEqual = 0;
+        for (int i = 0; i < (img.getHeight()*img.getWidth()); ++i) {
             unsigned char elementInMainData = data[i];
             unsigned char* iteratorDataP = *iterator1;
             unsigned char iteratorData = iteratorDataP[0];
             if (elementInMainData == iteratorData){ //Had REQUIRE here but accumalted to too many assertions in test
                 countIfEqual++;
             }
+            else{
+                countNotEqual++;
+                cout<<"Not equal"<<endl;
+            }
             ++iterator1;
         }
+        cout<<"Not equal this many times: "<<countNotEqual<<endl;
         //Test if counter is equal to total number of elements in array
         REQUIRE(countIfEqual == (img.getHeight()*img.getWidth()));
     }
@@ -199,8 +205,8 @@ TEST_CASE("Image class Iterator and its operators"){
         Image::iterator iterator1 = img.end();
         unsigned char* data = img.getData();
         int countIfEqual = 0;
-        for (int i = img.getHeight()*img.getWidth(); i >0; --i) {
-            unsigned char elementInMainData = data[i];
+        for (int i = (img.getHeight()*img.getWidth()); i >0; --i) {
+            unsigned char elementInMainData = data[i-1];
             unsigned char* iteratorDataP = *iterator1;
             unsigned char iteratorData = iteratorDataP[0];
             if (elementInMainData == iteratorData){ //Had REQUIRE here but accumalted to too many assertions in test
@@ -217,6 +223,19 @@ TEST_CASE("Thresholding, inverting and masking operator overloads"){
 
 }
 TEST_CASE("Addition and subtraction of images"){
+    string filename= "Lenna_standard.pgm";
+    string filename2 = "Lenna_standard.pgm";
+    Image img  = Image(filename2);
+    Image img2 = Image(filename);
+    SECTION("Addition test"){
+        Image addedImage = Image();
+        addedImage= img+img2;
+        Image::iterator iteratorI = addedImage.begin();
+        unsigned char * addedData = addedImage.getData();
+        unsigned char * image1Data = img.getData();
+        unsigned char * image2Data = img2.getData();
+        cout<<""<<endl;
+    }
 
 }
 TEST_CASE("Filtering operator on Image"){

@@ -30,6 +30,11 @@ namespace SCRSHA001{
     Image::Image(std::string &fileName) {
         load(fileName);
     }
+    Image::Image(unsigned char *dataInput,int width, int height) {
+        this->width = width;
+        this->height = height;
+        data.reset(dataInput);
+    }
 
     Image::~Image() {
         cout<<"Destructor called"<<endl;
@@ -147,12 +152,12 @@ namespace SCRSHA001{
         return data.get();
     }
 
-    Image::iterator Image::begin(void) {
+    Image::iterator Image::begin(void)const {
         return Image::iterator(data.get());
     }
 
-    Image::iterator Image::end(void) {
-        return Image::iterator((data.get()+(width*height))); //offset to end of array
+    Image::iterator Image::end(void)const {
+        return Image::iterator((data.get()+(width*height)-1)); //offset to end of array
     }
 
     unsigned char *&Image::iterator::operator*() {
@@ -168,4 +173,46 @@ namespace SCRSHA001{
         ptr = (ptr - 1);
         return *this;
     }
+
+    Image Image::operator+(const Image & rhs) const {
+        Image addedImage(*this);
+        addedImage += rhs;
+        return addedImage;
+    }
+
+    Image &Image::operator+=(const Image &rhs) {
+        if (this->getWidth() != rhs.getWidth() || this->getHeight() != rhs.getHeight()){
+            cout<<"Image parameters not equal!"<<endl;
+            exit(0);
+        }
+        //unsigned char * testData = addedImage.getData();
+        //unsigned char addedImage[width*height];
+        int counter = 0;
+        Image::iterator image1 = this->begin(); //Iterator for second image
+        //Would loop same amount of times for either image 1 or 2 iterator
+        for (Image::iterator image2 = rhs.begin(); image2 != rhs.end(); ++image2) { //Iterator for 1st image
+            unsigned char image1Pixel = (*image1)[0];
+            unsigned char image2Pixel = (*image2)[0];
+            if ( (image1Pixel + image2Pixel) >255){
+                //addedImage[counter] =  255;
+                *(*image1) = 255;
+            }
+            else{
+                *(*image1) = (image1Pixel + image2Pixel);
+                //addedImage[counter] = (image1Pixel + image2Pixel);
+            }
+            ++counter;
+            ++image1;
+        }
+        //unsigned char * testData2 = addedImage.getData();
+        //Image i = Image(addedImage, width, height);
+        return *this;
+    }
+
+    bool Image::iterator::operator!=(const Image::iterator &rhs) {
+        return (this->ptr != rhs.ptr);
+    }
+
+
+
 }
