@@ -10,8 +10,10 @@
 using namespace SCRSHA001;
 using namespace std;
 
+
 TEST_CASE("Image class loading and saving"){
     SECTION("Saving"){ //Tests save function
+        //Saves image, then reads in image and copares the two
         std::string filename= "donkey_mask.pgm";
         Image img2 = Image(filename);
         (img2).save("Clone2.pgm");
@@ -34,7 +36,7 @@ TEST_CASE("Image class loading and saving"){
         int n = memcmp(pChars,pChars2,length); //Compares two blocks of memory, if n ==0 then identical
         REQUIRE(n ==0);
     }
-    SECTION("Loading"){
+    SECTION("Loading "){ //Tests load function
         Image *img = new Image();
 
         (*img).load("donkey_mask.pgm");
@@ -54,9 +56,7 @@ TEST_CASE("Image class loading and saving"){
         REQUIRE((*img).getHeight() == 1207);
 
         delete img;
-
     }
-
 
 }
 
@@ -138,25 +138,21 @@ TEST_CASE("Image class Iterator and its operators"){
     SECTION("Iterator begin() and end() methods"){
         //Begin should point to the char at the beginning of the array
         Image::iterator iterator1 = img.begin();
-        unsigned char* iteratorDataP = *iterator1;
-        unsigned char iteratorData = iteratorDataP[0];
+        unsigned char iteratorData = *iterator1;
         unsigned char elementInMainData = img.getData()[0];
         REQUIRE(iteratorData == elementInMainData);
 
         //End should point to the char at the end of the array
         Image::iterator iterator2 = img.end();
-        unsigned char* iteratorDataP2 = *iterator2;
-        unsigned char iteratorData2 = iteratorDataP2[0];
-        unsigned char elementInMainData2 = img.getData()[img.getWidth() * img.getHeight()-1];
+        unsigned char iteratorData2 = *iterator2;
+        unsigned char elementInMainData2 = img.getData()[img.getWidth() * img.getHeight()];
         REQUIRE(iteratorData2 == elementInMainData2);
 
     }
     SECTION("Iterator constructor and * operator"){
         Image::iterator iterator1 = img.begin();
-        int n = memcmp(img.getData(),*iterator1,img.getWidth()*img.getHeight());
         unsigned char *data = img.getData();
-        REQUIRE(n == 0 );//Makes sure data is the same
-        REQUIRE(img.getData() == *iterator1);
+        REQUIRE(*img.getData() == *iterator1);
     }
     SECTION("Iterator copy operator"){
         Image::iterator iterator1 = img.begin();
@@ -166,11 +162,11 @@ TEST_CASE("Image class Iterator and its operators"){
     }
     SECTION("Iterator move operator"){
         Image::iterator iterator1 = img.begin();
-        unsigned char * storeOrginalBeforeMove = *iterator1;
+        unsigned char storeOrginalBeforeMove = *iterator1;
         Image::iterator iterator2 = iterator1;
         iterator2 = move(iterator1);
         REQUIRE(storeOrginalBeforeMove == *iterator2); //Checks if the data inside or the same
-        REQUIRE(*iterator1 == nullptr); //Iterator should now empty since moved out data
+        //REQUIRE(*iterator1 == nullptr); //Iterator should now empty since moved out data
     }
 
     SECTION("++ Iterator"){
@@ -180,8 +176,7 @@ TEST_CASE("Image class Iterator and its operators"){
         int countNotEqual = 0;
         for (int i = 0; i < (img.getHeight()*img.getWidth()); ++i) {
             unsigned char elementInMainData = data[i];
-            unsigned char* iteratorDataP = *iterator1;
-            unsigned char iteratorData = iteratorDataP[0];
+            unsigned char iteratorData = *iterator1;
             if (elementInMainData == iteratorData){ //Had REQUIRE here but accumalted to too many assertions in test
                 countIfEqual++;
             }
@@ -200,9 +195,8 @@ TEST_CASE("Image class Iterator and its operators"){
         unsigned char* data = img.getData();
         int countIfEqual = 0;
         for (int i = (img.getHeight()*img.getWidth()); i >0; --i) {
-            unsigned char elementInMainData = data[i-1];
-            unsigned char* iteratorDataP = *iterator1;
-            unsigned char iteratorData = iteratorDataP[0];
+            unsigned char elementInMainData = data[i];
+            unsigned char iteratorData = *iterator1;
             if (elementInMainData == iteratorData){ //Had REQUIRE here but accumalted to too many assertions in test
                 countIfEqual++;
             }
@@ -225,7 +219,7 @@ TEST_CASE("Addition and subtraction of images"){
         unsigned char * image1Data = img.getData();
         unsigned char * image2Data = img2.getData();
         int additionCorrectCounter = 0;
-        int loopTill = 100/*img.getWidth() * img.getHeight()*/;
+        int loopTill = 500/*img.getWidth() * img.getHeight()*/;
         for (int i = 0; i < loopTill; ++i) {
             unsigned char expectedAddedValue = addedData[i];
             unsigned char image1Val = image1Data[i];
@@ -271,17 +265,16 @@ TEST_CASE("Addition and subtraction of images"){
 TEST_CASE("Thresholding, inverting and masking operator overloads"){
     string filename= "Lenna_standard.pgm";
     string filename2 = "Lenna_hat_mask.pgm";
-    Image img  = Image(filename2);
-    Image img2 = Image(filename);
 
     SECTION("Inverse Test"){
-        Image copyOfOrig(img2);
-        Image inverse = !copyOfOrig;
+        Image img2(filename);
+        //Image copyOf(img2); //copies image first
+        Image inverse = !img2; //inverse image
         unsigned char * testAry = inverse.getData();
         int countIfInverse = 0;
         Image::iterator iteratorOfOrig = img2.begin();
         int counter = 0;
-        for(int i = 0; i < inverse.getWidth()*inverse.getHeight();++i){
+        for(int i = 0; i < (inverse.getWidth()*inverse.getHeight());++i){
             if ( inverse.getData()[i] == (255 - img2.getData()[i])){
                 countIfInverse++;
             }
@@ -292,6 +285,8 @@ TEST_CASE("Thresholding, inverting and masking operator overloads"){
     }
 
     SECTION("Mask test"){
+        Image img2(filename);
+        Image img(filename2);
         Image masking = img2/img;
         int counter = 0;
         for (int i = 0; i < img.getWidth()*img.getHeight(); ++i) {
@@ -306,11 +301,12 @@ TEST_CASE("Thresholding, inverting and masking operator overloads"){
         REQUIRE(counter > 254417);//If enough correct occurences to cover whole image -total length of char array then correct
     }
     SECTION("Threshold test"){
+        Image img(filename2);
         Image thresheld = img*10;
         unsigned char * nvdjndv = thresheld.getData();
         int counter = 0;
         for (Image::iterator i = thresheld.begin(); i != thresheld.end(); ++i) {
-            if ( ( *(*i ) == 0 ) || ( *(*i ) == 255 ) ){ //Image pixels should only be 0 or 255
+            if ( ( (*i ) == 0 ) || ( (*i ) == 255 ) ){ //Image pixels should only be 0 or 255
                 counter++;
             }
         }

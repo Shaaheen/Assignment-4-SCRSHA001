@@ -58,6 +58,8 @@ namespace SCRSHA001 {
 
         class iterator {
         private:
+            iterator(unsigned char *ptrToData, int givenIndex);
+
             friend class Image;
 
             unsigned char *ptr;
@@ -74,7 +76,7 @@ namespace SCRSHA001 {
             iterator &operator=(const iterator &rhs);
             iterator& operator=(iterator &&rhs);
 
-            unsigned char* &operator*();
+            unsigned char &operator*();
             iterator& operator++();
             iterator& operator--();
             bool operator!=(const iterator &rhs);
