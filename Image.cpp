@@ -22,7 +22,6 @@ namespace SCRSHA001{
         rhs.ptr = nullptr;
     }
 
-
     Image::Image() {
         height =0;
         width =0;
@@ -57,7 +56,9 @@ namespace SCRSHA001{
     Image &Image::operator=(const Image &rhs) {
         width = rhs.width;
         height = rhs.height;
-        data.reset(rhs.data.get());
+        unsigned char copyData[width*height];
+        strcpy((char *) copyData, (const char *) rhs.data.get());
+        data.reset(copyData);
         return *this;
     }
 
@@ -85,7 +86,6 @@ namespace SCRSHA001{
     }
 
     bool Image::load(string inFileName) {
-        //todo make << and >> ops to get the header info
         ifstream input(inFileName,ios::binary | ios::in);
         string line;
         int width;
@@ -109,17 +109,18 @@ namespace SCRSHA001{
             }
         }else{
             cout<<"Unable to open file"<< endl;
+            return false;
         }
         this->height = height;
         this->width = width;
 
         unsigned char* mainData= new unsigned char[width*height];
-        input.read((char *) mainData, width * height);
+        input.read((char *) mainData, width * height); //read in all of main data at once
 
-        (this->data).reset(mainData);
+        (this->data).reset(mainData); //store in unique pointer
 
         input.close();
-        return false;
+        return true;
     }
 
 
@@ -220,12 +221,10 @@ namespace SCRSHA001{
             unsigned char image1Pixel = (*image1)[0];
             unsigned char image2Pixel = (*image2)[0];
             if ( (image1Pixel - image2Pixel) <0){
-                //addedImage[counter] =  255;
                 *(*image1) = 0;
             }
             else{
                 *(*image1) = (image1Pixel - image2Pixel);
-                //addedImage[counter] = (image1Pixel + image2Pixel);
             }
             ++counter;
             ++image1;
@@ -236,11 +235,20 @@ namespace SCRSHA001{
 
     Image Image::operator!() {
         Image inverse(*this);
+        int counter =0;
         for (Image::iterator i = inverse.begin(); i != inverse.end(); ++i) {
             *(*i) = (unsigned char) (255 - (*(*i)));
+            counter++;
         }
+        cout<<counter<<endl;
         unsigned char * nd = inverse.getData();
         return inverse;
+    }
+    void Image::operator>>(const string file){
+        this->save(file);
+    }
+    void Image::operator<<(const string file){
+        this->load(file);
     }
 
     Image Image::operator/(const Image &rhs) const {
@@ -249,7 +257,7 @@ namespace SCRSHA001{
 
             Image::iterator iteratorMask = mask.begin();
             for (Image::iterator iteratorImage2 = rhs.begin(); iteratorImage2 != rhs.end(); ++iteratorImage2) {
-                if ( *(*iteratorImage2) == 0){
+                if ( *(*iteratorImage2) != 255){
                     *(*iteratorMask) = 0;
                 }
                 ++iteratorMask;
@@ -262,7 +270,16 @@ namespace SCRSHA001{
         }
     }
 
-    Image &Image::operator*(const int threshold) {
-        return <#initializer#>;
+    Image Image::operator*(const int threshold) {
+        Image thresheldImage(*this);
+        for (Image::iterator i = thresheldImage.begin(); i != thresheldImage.end(); ++i) {
+            if ( *(*i) > threshold){
+                *(*i) = 255;
+            }
+            else{
+                *(*i) = 0;
+            }
+        }
+        return thresheldImage;
     }
 }

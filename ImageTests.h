@@ -5,7 +5,7 @@
 #ifndef ASSIGNMENT_4_SCRSHA001_IMAGETESTS_H
 #define ASSIGNMENT_4_SCRSHA001_IMAGETESTS_H
 
-#include "catch.hpp"
+//#include "catch.hpp"
 #include "Image.h"
 
 class ImageTests {

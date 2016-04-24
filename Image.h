@@ -36,7 +36,7 @@ namespace SCRSHA001 {
         Image &operator-=(const Image & rhs);
         Image operator!() ; //Inverse operator
         Image operator/(const Image & rhs ) const; //Mask operator
-        Image &operator*(const int threshold); //Threshold operator
+        Image operator*(const int threshold); //Threshold operator
 
 
 
@@ -45,7 +45,8 @@ namespace SCRSHA001 {
         bool load(std::string inFileName);
 
 
-        friend std::ostream& operator>>(std::ifstream& os, int wh);
+        void operator>>(const std::string file);
+        void operator<<(const std::string file);
 
         int getWidth() const;
 
