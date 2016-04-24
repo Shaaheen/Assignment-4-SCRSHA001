@@ -2,11 +2,12 @@
 // Created by Shaaheen on 4/19/2016.
 //
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-#include "Image.h"
+#include "../catch.hpp"
+#include "../Image.h"
 #include "ImageTests.h"
 #include <string>
 #include <stdio.h>
+#include <cstring>
 using namespace SCRSHA001;
 using namespace std;
 
@@ -61,6 +62,7 @@ TEST_CASE("Image class loading and saving"){
 }
 
 TEST_CASE("Image class constructors") {
+
     string filename= "donkey_mask.pgm";
     string filename2 = "Lenna_hat_mask.pgm";
 
@@ -76,7 +78,6 @@ TEST_CASE("Image class constructors") {
         REQUIRE((defImg).getHeight() == 0);
     }
     SECTION("Destructor"){
-        cout<<"Begin destructor test"<<endl;
         Image *img = new Image(filename);
         delete img;
         REQUIRE(img->getHeight() == 0);
@@ -131,6 +132,7 @@ TEST_CASE("Image class constructors") {
 
 }
 TEST_CASE("Image class Iterator and its operators"){
+
     string filename= "donkey_mask.pgm";
     string filename2 = "Lenna_standard.pgm";
     Image img  = Image(filename2);
@@ -150,7 +152,7 @@ TEST_CASE("Image class Iterator and its operators"){
 
     }
     SECTION("Iterator constructor and * operator"){
-        Image::iterator iterator1 = img.begin();
+        Image::iterator iterator1 = Image::iterator(img.getData(),0);
         unsigned char *data = img.getData();
         REQUIRE(*img.getData() == *iterator1);
     }
@@ -186,7 +188,6 @@ TEST_CASE("Image class Iterator and its operators"){
             }
             ++iterator1;
         }
-        cout<<"Not equal this many times: "<<countNotEqual<<endl;
         //Test if counter is equal to total number of elements in array
         REQUIRE(countIfEqual == (img.getHeight()*img.getWidth()));
     }
@@ -208,12 +209,12 @@ TEST_CASE("Image class Iterator and its operators"){
 
 }
 TEST_CASE("Addition and subtraction of images"){
-    string filename= "Lenna_standard.pgm";
+    string filename= "Lenna_hat_mask.pgm";
     string filename2 = "Lenna_hat_mask.pgm";
     Image img  = Image(filename2);
     Image img2 = Image(filename);
     SECTION("Addition test"){
-        Image addedImage = Image();
+        Image addedImage;
         addedImage= img+img2; //Add images together
         unsigned char * addedData = addedImage.getData(); //Get data var to test against
         unsigned char * image1Data = img.getData();
@@ -235,7 +236,7 @@ TEST_CASE("Addition and subtraction of images"){
         REQUIRE(additionCorrectCounter == loopTill/*(img.getWidth() + img.getHeight())*/ );
     }
     SECTION("Subtraction test"){
-        Image addedImage = Image();
+        Image addedImage;
         addedImage= img-img2; //Add images together
         unsigned char * addedData = addedImage.getData(); //Get data var to test against
         unsigned char * image1Data = img.getData();

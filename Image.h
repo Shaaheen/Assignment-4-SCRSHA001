@@ -7,14 +7,12 @@
 
 
 #include <memory>
-#include "ImageTests.h"
 
 namespace SCRSHA001 {
     class Image{
     private:
         friend class iterator;
         //friend class ImageTests;
-        friend class ::ImageTests;
 
 
         int width, height;
@@ -58,7 +56,6 @@ namespace SCRSHA001 {
 
         class iterator {
         private:
-            iterator(unsigned char *ptrToData, int givenIndex);
 
             friend class Image;
 
@@ -82,7 +79,7 @@ namespace SCRSHA001 {
             bool operator!=(const iterator &rhs);
 
 
-
+            iterator(unsigned char *ptrToData, int givenIndex);
         };
 
         // define begin()/end() to get iterator to start and
