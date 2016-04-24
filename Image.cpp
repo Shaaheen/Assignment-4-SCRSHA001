@@ -10,24 +10,24 @@
 using namespace std;
 
 namespace SCRSHA001{
-    Image::iterator::iterator(const Image::iterator &rhs): ptr(rhs.ptr) { }
+    Image::iterator::iterator(const Image::iterator &rhs): ptr(rhs.ptr) { } //copy
 
-    Image::iterator::iterator(unsigned char *p): ptr(p) { }
-    Image::iterator& Image::iterator::operator=(const Image::iterator &rhs) {
+    Image::iterator::iterator(unsigned char *p): ptr(p), index(0){ } //constructor
+    Image::iterator& Image::iterator::operator=(const Image::iterator &rhs) { //copy assignment
         ptr = (rhs.ptr);
         return *this;
     }
-    Image::iterator& Image::iterator::operator=(Image::iterator &&rhs) {
+    Image::iterator& Image::iterator::operator=(Image::iterator &&rhs) { //move assignmen
         ptr = (move(rhs.ptr));
         rhs.ptr = nullptr;
     }
 
-    Image::Image() {
+    Image::Image() { //default constructo
         height =0;
         width =0;
     }
 
-    Image::Image(std::string &fileName) {
+    Image::Image(std::string &fileName) {//
         load(fileName);
     }
     Image::Image(unsigned char *dataInput,int width, int height) {
@@ -63,10 +63,10 @@ namespace SCRSHA001{
     }
 
     Image &Image::operator=(const Image &&rhs) {
-        //cout<<"Move op called"<<endl;
         width = move(rhs.width);
         height = move(rhs.height);
         data.reset(move(rhs.data).get());
+        //rhs.data.release();
         return *this;
     }
 
@@ -159,6 +159,8 @@ namespace SCRSHA001{
     }
 
     Image::iterator & Image::iterator::operator++() {
+        index++;
+        //ptr = ptr[index];
         ptr = (ptr + 1); //todo check if working
         return *this;
     }
@@ -235,13 +237,12 @@ namespace SCRSHA001{
 
     Image Image::operator!() {
         Image inverse(*this);
-        int counter =0;
+        int counter = 0;
         for (Image::iterator i = inverse.begin(); i != inverse.end(); ++i) {
-            *(*i) = (unsigned char) (255 - (*(*i)));
+            *(*i) = (unsigned char) (255 - *(*i));
+            //inverse.getData()[i.index] = (unsigned char) (255 - inverse.getData()[i.index]);
             counter++;
         }
-        cout<<counter<<endl;
-        unsigned char * nd = inverse.getData();
         return inverse;
     }
     void Image::operator>>(const string file){

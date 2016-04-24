@@ -61,6 +61,7 @@ namespace SCRSHA001 {
             friend class Image;
 
             unsigned char *ptr;
+            int index;
             // construct only via Image class (begin/end)
 
             iterator(unsigned char *p);// : ptr(p) {}
